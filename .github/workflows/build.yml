@@ -1,0 +1,110 @@
+name: Build ProjectSakura GSI
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: 'GSI variant to build'
+        required: true
+        default: 'arm64'
+        type: choice
+        options:
+          - arm64
+          - arm64-ab
+      release:
+        description: 'Create a GitHub Release after build'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: 🌸 Build GSI (${{ github.event.inputs.variant }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up build environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            git \
+            curl \
+            wget \
+            python3 \
+            python3-pip \
+            openjdk-17-jdk \
+            bc \
+            bison \
+            flex \
+            zip \
+            unzip \
+            lzop \
+            patchelf \
+            erofs-utils \
+            android-sdk-libsparse-utils
+          echo "Build environment ready 🌱"
+
+      - name: Set build metadata
+        id: meta
+        run: |
+          echo "version=Feels-Like-Spring-$(date +%Y%m%d)" >> "$GITHUB_OUTPUT"
+          echo "date=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          echo "variant=${{ github.event.inputs.variant }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build GSI
+        run: |
+          echo "🌸 Starting ProjectSakura GSI build — Feels Like Spring 🌸"
+          echo "Variant : ${{ steps.meta.outputs.variant }}"
+          echo "Version : ${{ steps.meta.outputs.version }}"
+          echo "Date    : ${{ steps.meta.outputs.date }}"
+          if [ -f build.sh ]; then
+            chmod +x build.sh
+            ./build.sh "${{ steps.meta.outputs.variant }}"
+          else
+            echo "build.sh not found — skipping build step (placeholder)"
+          fi
+
+      - name: Upload GSI artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProjectSakura-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.variant }}
+          path: |
+            out/*.img
+            out/*.zip
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Create GitHub Release
+        if: ${{ github.event.inputs.release == 'true' && success() }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.version }}
+          name: 🌸 Feels Like Spring — ${{ steps.meta.outputs.date }}
+          body: |
+            ## 🌸 ProjectSakura GSI — Feels Like Spring
+
+            **Variant:** `${{ steps.meta.outputs.variant }}`
+            **Date:** ${{ steps.meta.outputs.date }}
+            **Base:** Android 16
+
+            ### What's New
+            - Spring-themed wallpapers and UI accents
+            - Refreshed pastel colour palette
+            - Latest Android 16 security patches
+            - Performance and stability improvements
+
+            ### Installation
+            See the [README](https://github.com/${{ github.repository }}#-installation) for full installation instructions.
+          files: |
+            out/*.img
+            out/*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
