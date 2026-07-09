@@ -1,118 +1,88 @@
-# 🌸 ProjectSakura GSI — Feels Like Spring 🌸
+<div align="center">
+  <a href="https://github.com/ProjectInfinity-X">
+    <img src="https://github.com/ProjectSakura/SakuraDocs/raw/master/assets/header.png?raw=true" width="70%" />
+  </a>
+</div>
 
-> *Blossom into a new Android experience. Light, fresh, and alive.*
 
-[![Build Status](https://github.com/Doze-off/ProjectSakura_gsi/actions/workflows/build.yml/badge.svg)](https://github.com/Doze-off/ProjectSakura_gsi/actions/workflows/build.yml)
-[![Android 16](https://img.shields.io/badge/Android-16-green.svg)](https://developer.android.com/about/versions)
-[![Project Treble](https://img.shields.io/badge/Project-Treble-blue.svg)](https://android-developers.googleblog.com/2017/05/here-comes-treble-modular-base-for.html)
+Project Sakura GSI Treble
+------------------
 
----
+This is a GSI trebledroid with patches for specific devices, BPF bypass, firewall bypass, and much more.
 
-## 🌷 About
+------------------
 
-**ProjectSakura GSI** is a Generic System Image based on [ProjectSakura](https://github.com/ProjectSakura), bringing a clean, bloat-free Android 16 experience to any [Project Treble](https://android-developers.googleblog.com/2017/05/here-comes-treble-modular-base-for.html) compatible device.
+Create an overlay for your device to increase compatibility with GSI.
 
-The **Feels Like Spring** update brings a refreshed, lively aesthetic — think cherry blossoms in full bloom: smooth, vibrant, and full of life.
+build_overlay:
 
----
+Manual method: 
+For creating an overlay, follow this guide: How to create an overlay https://github.com/TrebleDroid/treble_experimentations/wiki/How-to-create-an-overlay%3F?
+Before submitting your overlay to the repository, make a correction using the #fix_overlay note in support group.
 
-## 🌸 What's New — Feels Like Spring
+Semi-automatic tool: 
+Required Linux pc or Termux, automatically creates flashable module: https://github.com/uzbforce/treble-rro-creator
 
-- 🌼 **Spring-themed wallpapers** — Fresh floral and nature-inspired artwork
-- 🍃 **Refreshed UI accents** — Soft pastel colour palette inspired by cherry blossoms
-- 🌱 **Android 16 base** — Built on the latest Android platform for maximum compatibility
-- 🦋 **Performance improvements** — Lighter, faster, and smoother than ever
-- 🌤️ **Updated system apps** — Latest security patches and app updates
-- 🌺 **Sakura animations** — Subtle spring-inspired motion effects throughout the UI
-
----
-
-## 📦 Downloads
-
-Check the [**Releases**](https://github.com/Doze-off/ProjectSakura_gsi/releases) page for the latest builds.
-
-| Variant      | Architecture | Description                     |
-|--------------|--------------|---------------------------------|
-| `arm64`      | ARM64        | For most modern 64-bit devices  |
-| `arm64-ab`   | ARM64 A/B    | For A/B partition devices       |
+Submit your overlay to this repository: https://github.com/Doze-off/vendor_hardware_overlay
 
 ---
 
-## 📋 Requirements
+Verify Overlay Status
 
-- **Project Treble** compatible device
-- **Unlocked bootloader**
-- A custom recovery (e.g. TWRP) or `fastboot` access
-- At least **3 GB RAM** recommended
-- **Android 9+** firmware on the device (for Treble support)
+PC:
+adb shell cmd overlay list --user current
 
----
+Termux:
+su
+cmd overlay list --user current
 
-## 🔧 Installation
+You should see something like:
+android
+[x]
+me.phh.treble.overlay.hotwav.w10pro
 
-1. Download the latest GSI image from the [Releases](https://github.com/Doze-off/ProjectSakura_gsi/releases) page.
-2. Boot into fastboot mode:
-   ```bash
-   adb reboot fastboot
-   ```
-3. Flash the GSI:
-   ```bash
-   fastboot flash system ProjectSakura-<version>-arm64.img
-   ```
-4. Wipe userdata (recommended for clean install):
-   ```bash
-   fastboot -w
-   ```
-5. Reboot and enjoy the blossoms! 🌸
+------------------
 
-> **Note:** Installation steps may vary by device. Always back up your data before flashing.
+How to flash ?
 
----
+🚨Test first in dsu sideloader use [DSU Sideloader](https://github.com/VegaBobo/DSU-Sideloader)
 
-## 🛠️ Building from Source
+There is no universal installation method, as each device has some different commands, but the one that works best is this one 
 
-This repository uses **GitHub Actions** to build the GSI automatically. To trigger a build:
+You can get vbmeta from the stock rom or from google
 
-1. Fork this repository.
-2. Go to **Actions** → **Build ProjectSakura GSI**.
-3. Click **Run workflow** and select your desired options.
+🟢 Clean Flash (GSI):
 
-To build locally, clone the repository and run:
+fastboot devices 
 
-```bash
-./build.sh
-```
+fastboot --disable-verification flash vbmeta vbmeta.img 
 
----
+fastboot --disable-verity --disable-verification flash vbmeta_system vbmeta_system.img 
 
-## 🐛 Bug Reports
+fastboot reboot fastboot 
 
-Found an issue? Please open a [GitHub Issue](https://github.com/Doze-off/ProjectSakura_gsi/issues) with:
-- Device name and model
-- Firmware version
-- Description of the issue
-- Logcat (if available)
+fastboot erase system 
 
----
+fastboot flash system system.img 
 
-## 🤝 Contributing
+fastboot reboot recovery 
+→ Clear data/cache
+→ Factory reset
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+⚠️ Error: "out of space" when flashing, use: 
+fastboot delete-logical-partition product 
 
----
+❗️If the error persists, use:
+fastboot delete-logical-partition system 
+fastboot create-logical-partition system 0 
 
-## 📜 Credits
+🔴 Dirty Flash: 
+fastboot flash system system.img
 
-- [ProjectSakura](https://github.com/ProjectSakura) — The upstream ROM source
-- [phhusson](https://github.com/phhusson) — Treble patches and GSI know-how
-- All contributors and testers 🌸
+------------------
 
----
+### Support Group: [DozeOff GSI Treble](https://t.me/dozeoff_treble)
 
-## 📄 License
-
-This project is licensed under the [Apache License 2.0](LICENSE).
-
----
-
-<p align="center">Made with 🌸 and lots of ☕</p>
+Big thanks 
+for @TrebleDroid for some
+patches
